@@ -17,7 +17,7 @@ struct VkCoreContext {
     VkPhysicalDevice physical_device;
     VkDevice device;
     VkSurfaceKHR surface;
-    VkSurfaceFormatKHR color_buffer_format;
+    VkSurfaceFormatKHR surface_format;
     VkSwapchainKHR swap_chain;
 };
 
@@ -41,12 +41,19 @@ struct VkDepthStencilContext {
 };
 
 struct VkFramebufferContext {
-    uint32_t width;
-    uint32_t height;
     uint32_t index;
+    VkExtent2D resolution;
     std::vector<VkFramebuffer> buffers;
     std::vector<VkImage> images;
     std::vector<VkImageView> views;
+};
+
+struct VulkanInitializeInfo {
+    const void* native_window = ;
+    uint32_t display_width;
+    uint32_t display_height;
+    VkFormat color_format;
+    VkFormat depth_stencil_format;
 };
 
 union VkColor {
@@ -69,32 +76,41 @@ class VulkanDevice final {
 private:
     void CreateInstance();
     void CreatePhysicalDevice();
-    void CreateSurface(void* window);
+    void CreateSurface(const void* window);
     void CreateDevice();
     void CreateSwapChain(const VkExtent2D resolution, const VkFormat color_format);
-    void CreateDepthStencilView();
+    void CreateFrameImageViews();
+    void CreateDepthStencilView(const VkFormat format);
+    void CreateRenderPass();
+    void CreateFrameBuffer();
+    void CreateCommandPool();
+    void CreateSyncResources();
+    void DestroySwapChain();
     bool GetMappedMemoryIndex(const uint32_t bits, const VkFlags flags, uint32_t* mapped_index);
+    
+    void InitializeVulkanApi(
+        const void* window, 
+        const VkExtent2D resolution, 
+        const VkFormat color_format, 
+        const VkFormat depth_stencil_format);
+        
+    void TerminateVulkanApi();
 
 public:
     VulkanDevice();
     ~VulkanDevice();
     
-    void Initialize(
-        void* window, 
-        const uint32_t display_width, 
-        const uint32_t display_height, 
-        const VkFormat color_format);
-        
+    void Initialize(const VulkanInitializeInfo& init_info);
     void Destroy();
-    
     void ClearFrameBuffer(const VkColor& clear_color, const float depth = 1.0f, const uint8_t stencil_mask = 0x00);
     void SwapBuffers();
     
 private:
+    bool m_initialized {};
     VkCoreContext m_core;
     VkQueueContainer m_graphics_queue;
     VkQueueContainer m_surface_queue;
-    VkRenderPass m_current_pass; // TODO: Eliminate that by using bindless method
+    VkRenderPass m_current_pass; // TODO: Eliminate that by using dynamic rendering
     VkCommandContext m_command;
     VkSyncResources m_sync;
     VkDepthStencilContext m_depth_stencil;

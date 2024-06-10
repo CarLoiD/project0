@@ -56,7 +56,7 @@ void VulkanDevice::CreatePhysicalDevice() {
     Util::Assert(m_core.physical_device != VK_NULL_HANDLE, "Failed to find a capable Vulkan physical device");
 }
 
-void VulkanDevice::CreateSurface(void* window) {
+void VulkanDevice::CreateSurface(const void* window) {
     VkResult result {};
     
 #if defined(ZX_WINDOWS)
@@ -107,7 +107,7 @@ void VulkanDevice::CreateDevice() {
         }
     }
     
-    float queue_priority = 1.0f;
+    const float queue_priority = 1.0f;
     
     VkDeviceQueueCreateInfo queue_info {};
     queue_info.sType             = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -129,15 +129,90 @@ void VulkanDevice::CreateDevice() {
     vkGetDeviceQueue(m_core.device, m_surface_queue.index, 0, &m_surface_queue.handle);
 }
 
-void VulkanDevice::CreateSwapChain(const VkExtent2D resolution, const VkFormat color_format
-) {
+void VulkanDevice::CreateSwapChain(const VkExtent2D resolution, const VkFormat color_format) {
+    uint32_t format_count {};
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_code.physical_device, m_core.surface, &format_count, nullptr);
+    
+    std::vector<VkSurfaceFormatKHR> formats(format_count);
+    vkGetPhysicalDedviceSurfaceFormatsKHR(m_code.physical_device, m_core.surface, &format_count, formats.data());
+    
+    const int32_t format_index = [&](){
+        int32_t ret = -1;
+        int32_t index = 0;
+        for (auto& iter : formats) {
+            if (iter.format == color_format) {
+                ret = index;
+                break;
+            }
+            ++index;
+        }
+        return ret;
+    }();
+    
+    Util::Assert(format_index != -1, "Current VkSurface does not support the requested color buffer format");
+    
+    m_core.surface_format = formats.at(format_index);
+    m_frame.resolution = resolution;
+    
+    const uint32_t min_image_count = [](){  VkSurfaceCapabilitiesKHR caps;
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_core.physical_device, m_core.surface, &caps);
+        return caps.minImageCount;
+    }();
+    
+    VkSwapchainCreateInfoKHR create_info {};
+    create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    create_info.surface = m_core.surface;
+    create_info.minImageCount = min_image_count;
+    create_info.imageFormat = m_core.surface_format.format;
+    create_info.imageColorSpace = m_core.surface_format.colorSpace;
+    create_info.imageExtent = resolution;
+    create_info.imageArrayLayers = 1;
+    create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    create_info.imageSharingMode = 
+}
+
+void VulkanDevice::CreateFrameImageViews() {
+}
+
+void VulkanDevice::CreateDepthStencilView(const VkFormat format) {
+}
+
+void VulkanDevice::CreateRenderPass() {
+}
+
+void VulkanDevice::CreateFrameBuffer() {
+}
+
+void VulkanDevice::CreateCommandPool() {
+}
+
+void VulkanDevice::CreateSyncResources() {
+}
+
+void VulkanDevice::DestroySwapChain() {
 
 }
 
-void VulkanDevice::CreateDepthStencilView() {
+bool VulkanDevice::GetMappedMemoryIndex(const uint32_t bits, const VkFlags flags, uint32_t* mapped_index) {
+    return true;
+}
+
+void VulkanDevice::InitializeVulkanApi(
+    const void* window, 
+    const VkExtent2D resolution, 
+    const VkFormat color_format,
+    const VkFormat depth_stencil_format
+) {
+    CreateSurface(window);
+    CreateDevice();
+    CreateSwapChain(display_width, display_height, color_format);
+}
+
+void VulkanDevice::TerminateVulkanApi() {
 }
 
 VulkanDevice::VulkanDevice() {
+    // Instance and physical device are initialized on the default constructor
     CreateInstance();
     CreatePhysicalDevice();
 }
@@ -146,19 +221,23 @@ VulkanDevice::~VulkanDevice() {
     Destroy();
 }
 
-void VulkanDevice::Initialize(
-    void* window, 
-    const uint32_t display_width, 
-    const uint32_t display_height, 
-    const VkFormat color_format
-) {
-    CreateSurface(window);
-    CreateDevice();
-    CreateSwapChain(display_width, display_height, color_format);
+void VulkanDevice::Initialize(const VulkanInitializeInfo& init_info) {
+    const VkExtent2D extent { init_info.display_width, init_info.display_height };
+    
+    InitializeVulkanApi(
+        init_info.native_window, 
+        extent, 
+        init_info.color_format,
+        init_info.depth_stencil_format);
+        
+    m_initialized = true;
 }
 
 void VulkanDevice::Destroy() {
-
+    if (m_initialized) {
+        TerminateVulkanApi();
+        m_initialized = false;
+    }
 }
 
 void VulkanDevice::ClearFrameBuffer(const VkColor& clear_color, const float depth, const uint8_t stencil_mask) {
