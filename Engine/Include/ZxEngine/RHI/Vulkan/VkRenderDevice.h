@@ -17,6 +17,7 @@ namespace RHI {
         VkSurfaceKHR surface;
         VkSurfaceFormatKHR surfaceFormat;
         VkSwapchainKHR swapChain;
+        VkRenderPass currentPass;
     };
     
     struct VkCommandContext {
@@ -52,7 +53,7 @@ namespace RHI {
     };
     
     struct VkInitializeInfo {
-        const void* nativeWindow = nullptr;
+        void* nativeWindow = nullptr;
         uint32_t displayWidth;
         uint32_t displayHeight;
         VkFormat colorFormat;
@@ -63,7 +64,7 @@ namespace RHI {
     private:
         void createInstance();
         void createPhysicalDevice();
-        void createSurface(const void* nativeWindow);
+        void createSurface(void* nativeWindow);
         void createLogicalDevice();
         void createSwapChain(const VkExtent2D resolution, const VkFormat colorFormat);
         void createFrameImageViews();
@@ -76,7 +77,7 @@ namespace RHI {
         bool getMappedMemoryIndex(const uint32_t bits, const VkFlags flags, uint32_t& mappedIndex);
         
         void initializeVulkanApi(
-            const void* nativeWindow,
+            void* nativeWindow,
             const VkExtent2D resolution,
             const VkFormat colorFormat,
             const VkFormat depthStencilFormat);
@@ -84,7 +85,7 @@ namespace RHI {
         void terminateVulkanApi();
         
     public:
-        VkRenderDevice(const VkInitializeInfo& initInfo);
+        VkRenderDevice(const RHI::VkInitializeInfo& initInfo);
         ~VkRenderDevice();
         
         void clearFrameBuffer(const RHI::Color& clearColor) override;
@@ -92,14 +93,14 @@ namespace RHI {
         
     private:
         bool mInitialized;
-        VkCoreContext mCore;
-        VkQueueContainer mGraphicsQueue;
-        VkQueueContainer mSurfaceQueue;
-        VkRenderPass mCurrentPass;
-        VkCommandContext mCommand;
-        VkSyncResources mSync;
-        VkDepthStencilContext mDepthStencil;
-        VkFramebufferContext mFrame;
+        
+        RHI::VkCoreContext m_core;
+        RHI::VkQueueContainer m_graphicsQueue;
+        RHI::VkQueueContainer m_surfaceQueue;
+        RHI::VkCommandContext m_command;
+        RHI::VkSyncResources m_sync;
+        RHI::VkDepthStencilContext m_depthStencil;
+        RHI::VkFramebufferContext m_frameBuffer;
     };
 }
 

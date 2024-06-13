@@ -1,6 +1,10 @@
 #include "AppBase.h"
-
+#include "Core/Macros.h"
 #include "Core/Utils.h"
+
+#if defined(ZX_RENDER_API_VULKAN)
+#include "RHI/Vulkan/VkRenderDevice.h"
+#endif
 
 static constexpr bool kStartFullscreen = false;
 static constexpr uint32_t kDefaultDisplayW = 1280;
@@ -26,7 +30,7 @@ bool AppBase::isProcessingEvents() {
 }
 
 void AppBase::createNativeWindow(const uint32_t displayWidth, const uint32_t displayHeight) {
-    Application::Window* wnd = &mWindow;
+    Application::Window* wnd = &m_window;
     if (!wnd->nativeHandle) {
     #if defined(ZX_WINDOWS)
         auto windowProc = [](HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
@@ -54,8 +58,7 @@ void AppBase::createNativeWindow(const uint32_t displayWidth, const uint32_t dis
         const uint32_t wndPosition = kStartFullscreen ? 0 : CW_USEDEFAULT;
         const uint32_t wndStyle = kStartFullscreen ? kBorderlessStyle : WS_OVERLAPPEDWINDOW;
         
-        HWND wndHandle = reinterpret_cast<HWND>(wnd->nativeHandle);
-        wndHandle = CreateWindowExA(
+        HWND wndHandle = CreateWindowExA(
             0,
             wclass.lpszClassName,
             wndTitle,
@@ -81,13 +84,36 @@ void AppBase::createNativeWindow(const uint32_t displayWidth, const uint32_t dis
             ShowCursor(false); // Hide the cursor on fullscreen
         }
         
-        mWindow.displayWidth  = displayWidth;
-        mWindow.displayHeight = displayHeight;
+        m_window.nativeHandle  = reinterpret_cast<void*>(wndHandle);
+        m_window.displayWidth  = displayWidth;
+        m_window.displayHeight = displayHeight;
     #endif
     }
 }
 
+void AppBase::attachGraphicsApi() {
+#if defined(ZX_RENDER_API_VULKAN)
+    assert(m_window.nativeHandle != nullptr, "AppBase::attachGraphicsApi() window native handle must be valid");
+
+    RHI::VkInitializeInfo info;
+    info.nativeWindow        = m_window.nativeHandle;
+    info.displayWidth        = m_window.displayWidth;
+    info.displayHeight       = m_window.displayHeight;
+    info.colorFormat         = VK_FORMAT_R8G8B8A8_UNORM;
+    info.depthStencilFormat  = VK_FORMAT_D24_UNORM_S8_UINT;
+    
+    m_api = new RHI::VkRenderDevice(info);
+#endif
+}
+
 AppBase::AppBase() {
+}
+
+AppBase::~AppBase() {
+    if (m_api) {
+        delete m_api;
+        m_api = nullptr;
+    }
 }
 
 void AppBase::run(int argc, char* argv[]) {
@@ -96,6 +122,8 @@ void AppBase::run(int argc, char* argv[]) {
     uint32_t h { kDefaultDisplayH };
     
     createNativeWindow(w, h);
+    attachGraphicsApi();
+    
     onCreate();
     
     // TODO: Implement
@@ -105,6 +133,6 @@ void AppBase::run(int argc, char* argv[]) {
 }
 
 void AppBase::setWindowTitle(const char* title) {
-    mWindow.titlebarText = title;
+    m_window.titlebarText = title;
     // TODO: If native window is created, update the window title dynamically
 }

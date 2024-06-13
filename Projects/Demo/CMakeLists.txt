@@ -20,3 +20,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${ROOT}/Engine/Include/" "So
 target_link_directories(${PROJECT_NAME} PRIVATE "${ROOT}/Engine/Lib/")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ZxEngine)
+
+# Run
+
+if(WIN32)
+    set(RUN_CMD start cmd.exe /c ${ROOT}/Build/${PROJECT_NAME}.exe)
+endif()
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${RUN_CMD}
+)

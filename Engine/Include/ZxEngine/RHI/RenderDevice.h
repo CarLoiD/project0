@@ -6,7 +6,7 @@
 namespace RHI {
     struct RenderDevice {
         virtual ~RenderDevice() {}
-        virtual void clearFrameBuffer(const RHI::Color& clearColor) = 0;
+        virtual void clearFrameBuffer(const Color& clearColor) = 0;
         virtual void swapBuffers() = 0;
     };
 } // namespace RHI

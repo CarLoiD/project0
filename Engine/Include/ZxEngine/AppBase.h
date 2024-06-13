@@ -15,11 +15,12 @@ namespace Application {
     private:
         bool isProcessingEvents();
         void createNativeWindow(const uint32_t displayWidth, const uint32_t displayHeight);
+        void attachGraphicsApi();
         void destroyNativeWindow();
         
     public:
         AppBase();
-        virtual ~AppBase() {};
+        virtual ~AppBase();
         
         // To be implemented by the application
         virtual void onCreate() = 0;
@@ -30,12 +31,12 @@ namespace Application {
         void setWindowTitle(const char* title);
         void run(int argc, char* argv[]);
         
-        RHI::RenderDevice* getRenderApi() const;
+    protected:
+        RHI::RenderDevice* m_api = nullptr;
         
     private:
-        bool mInitialized;
-        Application::Window mWindow;
-        RHI::RenderDevice* mRenderApi = nullptr;
+        bool m_initialized;
+        Application::Window m_window;
     };   
 } // namespace Application
 
