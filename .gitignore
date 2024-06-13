@@ -1,2 +1,3 @@
-out/
+Build/
+Engine/Lib/
 *.exe
