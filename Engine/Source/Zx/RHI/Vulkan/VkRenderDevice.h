@@ -13,6 +13,13 @@ namespace RHI {
         VkFormat depthStencilFormat;
     };
 
+    struct CommandBuffer() {
+        virtual ~CommandBuffer() {}
+        virtual void Submit() = 0;
+        virtual void map() = 0;
+        virtual void unmap() = 0;
+    };
+
     class VkRenderDevice final : public RHI::RenderDevice {
     private:
         void createInstance();
@@ -28,25 +35,25 @@ namespace RHI {
         void createSyncResources();
         void destroySwapChain();
         bool getMappedMemoryIndex(const uint32_t bits, const VkFlags flags, uint32_t& mappedIndex);
-        
+
         void initializeVulkanApi(
             void* nativeWindow,
             const VkExtent2D resolution,
             const VkFormat colorFormat,
             const VkFormat depthStencilFormat);
-            
+
         void terminateVulkanApi();
-        
+
     public:
         VkRenderDevice(const RHI::VkInitializeInfo& initInfo);
         ~VkRenderDevice();
-        
+
         void clearFrameBuffer(const RHI::Color& clearColor) override;
         void swapBuffers() override;
-        
+
     private:
         bool mInitialized;
-        
+
         RHI::VkCoreContext m_core;
         RHI::VkQueueContainer m_graphicsQueue;
         RHI::VkQueueContainer m_surfaceQueue;
