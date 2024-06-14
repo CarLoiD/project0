@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <ZxEngine/AppBase.h>
+#include <Zx/AppBase.h>
 
 class Game final : public Application::AppBase {
 public:

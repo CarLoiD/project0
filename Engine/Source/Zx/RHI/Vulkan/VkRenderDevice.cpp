@@ -22,6 +22,11 @@ constexpr const char* kValidationLayers[] = {
 }; 
 constexpr uint32_t kValidationLayerCount = SIZEOF_ARRAY_PTR(kValidationLayers);
 
+struct VkQueueContainer {
+    VkQueue handle = VK_NULL_HANDLE;
+    int32_t index = -1;
+};
+
 using namespace RHI;
 
 void VkRenderDevice::createInstance() {
@@ -43,6 +48,11 @@ void VkRenderDevice::createInstance() {
     
     VkResult result = vkCreateInstance(&createInfo, nullptr, &m_core.instance);
     assert(result == VK_SUCCESS, "VkRenderDevice::createInstance() - vkCreateInstance() failed");
+}
+
+void VkRenderDevice::createPhysicalDevice() {
+  if (uint32_t deviceCount {};
+      vkEnumeratePhysicalDevices(m_core.instance, &deviceCount, nullptr) == VK_SUCCESS)
 }
 
 void VkRenderDevice::createPhysicalDevice() {

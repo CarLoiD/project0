@@ -10,12 +10,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/Lib/)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/Lib/)
 
 # Static Library Output
-
 set(SOURCES
-    "Source/AppBase.cpp"
-    "Source/Core/Utils.cpp"
-    "Source/RHI/Color.cpp"
-    "Source/RHI/Vulkan/VkRenderDevice.cpp"
+    "Source/Zx/AppBase.cpp"
+    "Source/Zx/Core/Utils.cpp"
+    "Source/Zx/RHI/Color.cpp"
+    "Source/Zx/RHI/Vulkan/VkRenderDevice.cpp"
 )
 
 add_library(${PROJECT_NAME} ${SOURCES})
@@ -33,5 +32,5 @@ endif()
 # Vulkan Required
 find_package(Vulkan REQUIRED)
 
-target_include_directories(${PROJECT_NAME} PRIVATE "Include" "Include/ZxEngine" ${Vulkan_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE "Source/Zx" ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Vulkan_LIBRARIES})
