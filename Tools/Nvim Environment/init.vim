@@ -1,5 +1,5 @@
 " Default Colorscheme
-colorscheme alduin 
+colorscheme zx
 
 " Misc buffer options
 set number relativenumber
