@@ -1,5 +1,5 @@
 " Default Colorscheme
-colorscheme zx
+colorscheme zx 
 
 " Misc buffer options
 set number relativenumber
@@ -26,6 +26,12 @@ augroup number_toggle
 	autocmd!
 	autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu && mode() != "i" | set rnu   | endif
 	autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
+augroup END
+
+augroup cursor_line
+	autocmd!
+	autocmd VimEnter,FocusGained,WinEnter,BufWinEnter * setlocal cursorline
+	autocmd BufLeave,FocusLost,WinLeave * setlocal nocursorline
 augroup END
 
 nmap <C-n> :vertical res +2<CR>

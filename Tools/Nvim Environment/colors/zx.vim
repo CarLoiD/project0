@@ -27,6 +27,7 @@ let s:dark      = { "gui": "#000000" } " Status line dark color
 let s:functions = { "gui": "#FFFFFF" } " Functions
 let s:macros    = { "gui": "#8CDE94" } " Preprocessor Macros
 let s:types     = { "gui": "#7AD0C6" } " Types
+let s:curLine   = { "gui": "#163339" } " Current line at the cursor 
 
 function! s:h(group, style)
    execute "hi!" a:group
@@ -66,9 +67,7 @@ call s:h("Todo",           { "fg": s:fg1, "bg": s:bg0 })
 
 " Misc.
 
-set cursorline
-set cursorlineopt=number
-
+call s:h("CursorLine",     { "bg": s:curLine })
 call s:h("StatusLine",     { "fg": s:dark, "bg": s:fg0 })
 call s:h("StatusLineNC",   { "fg": s:dark, "bg": s:fg0 })
 call s:h("LineNr",         { "fg": s:fg0light })
