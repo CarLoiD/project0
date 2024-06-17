@@ -30,7 +30,7 @@ namespace RHI {
         VkSemaphore imageSema;
         VkSemaphore finishSema;
         VkFence* fences = nullptr;
-        uint32_t numFences {};
+        uint32_t fenceCount {};
     };
 
     struct VkDepthStencilContext {
@@ -40,15 +40,15 @@ namespace RHI {
         VkFormat format = VK_FORMAT_UNDEFINED;
     };
 
-    struct VkFramebufferContext {
+    struct VkFrameBufferContext {
         int32_t index = -1;
         VkExtent2D resolution;
         VkFramebuffer* buffers = nullptr;
-        uint32_t numBuffers {};
+        uint32_t bufferCount {};
         VkImage* images = nullptr;
-        uint32_t numImages {};
+        uint32_t imageCount {};
         VkImageView* views = nullptr;
-        uint32_t numViews {};
+        uint32_t viewCount {};
     };
 }
 

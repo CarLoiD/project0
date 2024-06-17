@@ -60,7 +60,7 @@ namespace RHI {
         RHI::VkCommandContext m_command;
         RHI::VkSyncResources m_sync;
         RHI::VkDepthStencilContext m_depthStencil;
-        RHI::VkFramebufferContext m_frameBuffer;
+        RHI::VkFrameBufferContext m_frameBuffer;
     };
 }
 

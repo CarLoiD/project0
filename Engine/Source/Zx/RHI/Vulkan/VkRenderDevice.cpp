@@ -186,6 +186,27 @@ void VkRenderDevice::createSwapChain(const VkExtent2D resolution, const VkFormat
 
     VkResult result = vkCreateSwapchainKHR(m_core.logicalDevice, &createInfo, nullptr, &m_core.swapChain);
     assert(result == VK_SUCCESS, "VkRenderDevice::createSwapChain() - vkCreateSwapChainKHR() failed");
+
+    const uint32_t imageCount = [&, this](void) { uint32_t ret {};
+        vkGetSwapchainImagesKHR(m_core.logicalDevice, m_core.swapChain, &ret, nullptr);
+        return ret;
+    }();
+
+    assert(imageCount, "VkRenderDevice::createSwapChain() - image count on swap chain is invalid");
+
+    // Reserve memory
+    m_frameBuffer.buffers  = new VkFramebuffer[imageCount];
+    m_sync.fences          = new VkFence[imageCount];
+    m_frameBuffer.images   = new VkImage[imageCount];
+    m_frameBuffer.views    = new VkImageView[imageCount];
+    
+    m_frameBuffer.bufferCount = imageCount;
+    m_sync.fenceCount = imageCount;
+    m_frameBuffer.imageCount = imageCount;
+    m_frameBuffer.viewCount = imageCount;
+
+    result = vkGetSwapchainImagesKHR(m_core.logicalDevice, m_core.swapChain, &imageCount, m_frameBuffer.images);
+    assert(result == VK_SUCCESS, "VkRenderDevice::createSwapChain() - vkGetSwapchainImagesKHR() failed");
 }
 
 void VkRenderDevice::createFrameImageViews() {
