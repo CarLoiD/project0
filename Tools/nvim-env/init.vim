@@ -33,6 +33,3 @@ augroup cursor_line
 	autocmd VimEnter,FocusGained,WinEnter,BufWinEnter * setlocal cursorline
 	autocmd BufLeave,FocusLost,WinLeave * setlocal nocursorline
 augroup END
-
-nmap <C-n> :vertical res +2<CR>
-nmap <C-m> :vertical res -2<CR>
