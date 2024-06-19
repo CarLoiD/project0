@@ -10,10 +10,18 @@ static constexpr bool kStartFullscreen = false;
 static constexpr uint32_t kDefaultDisplayW = 1280;
 static constexpr uint32_t kDefaultDisplayH = 720;
 
+// Platform code
 #if defined(ZX_WINDOWS)
+
 #include <windows.h>
 static constexpr uint32_t kBorderlessStyle = WS_POPUP | WS_SYSMENU | WS_MAXIMIZE;
-static constexpr const char* kDefaultTitlebarText = "Project0 - Vulkan";
+static constexpr const char* kDefaultTitlebarText = "Project0 (Win32 - Vulkan)";
+
+#elif defined(ZX_LINUX)
+
+#include <X11/Xlib.h>
+static constexpr const char* kDefaultTitlebarText = "Project0 (Linux - Vulkan)";
+
 #endif
 
 using namespace Application;
@@ -26,6 +34,8 @@ bool AppBase::isProcessingEvents() {
         DispatchMessageA(&handler);
     }
     return handler.message != WM_QUIT;
+#elif defined(ZX_LINUX)
+    return true;
 #endif
 }
 

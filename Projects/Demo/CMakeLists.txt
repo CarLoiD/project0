@@ -25,6 +25,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ZxEngine)
 
 if(WIN32)
     set(RUN_CMD start cmd.exe /c ${ROOT}/Build/${PROJECT_NAME}.exe)
+elseif(UNIX)
+    set(RUN_CMD gnome-terminal -- ${ROOT}/Build/${PROJECT_NAME})
 endif()
 
 add_custom_command(

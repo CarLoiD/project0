@@ -33,3 +33,6 @@ augroup cursor_line
 	autocmd VimEnter,FocusGained,WinEnter,BufWinEnter * setlocal cursorline
 	autocmd BufLeave,FocusLost,WinLeave * setlocal nocursorline
 augroup END
+
+nmap <F5> :!cmake --build Build/<CR>
+nmap <F4> :!rm -rf Build/ && cmake . -B Build/ -G Ninja<CR>

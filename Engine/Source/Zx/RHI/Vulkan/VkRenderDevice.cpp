@@ -148,9 +148,9 @@ void VkRenderDevice::createSwapChain(const VkExtent2D resolution, const VkFormat
     vkGetPhysicalDeviceSurfaceFormatsKHR(m_core.physicalDevice, m_core.surface, &formatCount, formats);
 
     int32_t formatIndex = -1;
-    for (int32_t index = 0; index < formatCount; ++index) {
+    for (uint32_t index = 0; index < formatCount; ++index) {
         if (formats[index].format == colorFormat) {
-            formatIndex = index;
+            formatIndex = static_cast<int32_t>(index);
             break;
         }
     }
@@ -158,13 +158,13 @@ void VkRenderDevice::createSwapChain(const VkExtent2D resolution, const VkFormat
     assert(formatIndex >= 0, "VkRenderDevice::createSwapChain() - internal surface does not support the requested color format");
 
     // Copy over the format
-    m_core.surfaceFormat = formats[index];
+    m_core.surfaceFormat = formats[formatIndex];
     delete[] formats; // Can now safely delete
 
     m_frameBuffer.resolution = resolution;
 
-    const uint32_t minImageCount = [](void) { VkSurfaceCapabilitiesKHR surfaceCaps;
-        vkGetPhysicalDeviceSurfaceCapabilitesKHR(m_core.physicalDevice, m_core.surface, &surfaceCaps);
+    const uint32_t minImageCount = [&, this](void) { VkSurfaceCapabilitiesKHR surfaceCaps;
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_core.physicalDevice, m_core.surface, &surfaceCaps);
         return surfaceCaps.minImageCount;
     }();
 
@@ -179,7 +179,7 @@ void VkRenderDevice::createSwapChain(const VkExtent2D resolution, const VkFormat
     createInfo.imageUsage               = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     createInfo.imageSharingMode         = VK_SHARING_MODE_EXCLUSIVE;
     createInfo.queueFamilyIndexCount    = 1;
-    createInfo.pQueueFamilyIndices      = &m_graphicsQueue.index;
+    createInfo.pQueueFamilyIndices      = reinterpret_cast<const uint32_t*>(&m_graphicsQueue.index);
     createInfo.preTransform             = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     createInfo.compositeAlpha           = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
     createInfo.presentMode              = VK_PRESENT_MODE_FIFO_KHR;
@@ -205,7 +205,12 @@ void VkRenderDevice::createSwapChain(const VkExtent2D resolution, const VkFormat
     m_frameBuffer.imageCount = imageCount;
     m_frameBuffer.viewCount = imageCount;
 
-    result = vkGetSwapchainImagesKHR(m_core.logicalDevice, m_core.swapChain, &imageCount, m_frameBuffer.images);
+    result = vkGetSwapchainImagesKHR(
+        m_core.logicalDevice, 
+        m_core.swapChain, 
+        &m_frameBuffer.imageCount, 
+        m_frameBuffer.images);
+
     assert(result == VK_SUCCESS, "VkRenderDevice::createSwapChain() - vkGetSwapchainImagesKHR() failed");
 }
 

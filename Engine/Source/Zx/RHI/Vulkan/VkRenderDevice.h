@@ -13,13 +13,6 @@ namespace RHI {
         VkFormat depthStencilFormat;
     };
 
-    struct CommandBuffer() {
-        virtual ~CommandBuffer() {}
-        virtual void Submit() = 0;
-        virtual void map() = 0;
-        virtual void unmap() = 0;
-    };
-
     class VkRenderDevice final : public RHI::RenderDevice {
     private:
         void createInstance();

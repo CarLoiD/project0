@@ -1,6 +1,6 @@
 #include "Game.h"
 
-constexpr const char* kAppTitle = "Project0"; 
+constexpr const char* kAppTitle = "Project0";
 
 int main(int argc, char* argv[]) {
     Game instance;

@@ -25,6 +25,8 @@ target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Wno-unu
 # Platform Macros
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE ZX_WINDOWS VK_USE_PLATFORM_WIN32_KHR)
+elseif(UNIX)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ZX_LINUX VK_USE_PLATFORM_XLIB_KHR)
 endif()
 
 # Libraries and Includes
